@@ -1,0 +1,4 @@
+name = "cracha-ia-da-torcida-api"
+main = "worker.js"
+compatibility_date = "2026-07-05"
+compatibility_flags = ["nodejs_compat"]
