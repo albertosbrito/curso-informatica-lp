@@ -74,55 +74,34 @@ async function handleGenerate(request, env, ctx) {
   catch (e) { return cors(json({ error: e.message }, 400)); }
 
   const prompt = `
-Edite esta fotografia real.
+Edite esta fotografia real. Isto é uma edição da foto enviada, não uma criação de uma pessoa nova.
 
-Esta é uma EDIÇÃO da foto enviada, não crie uma pessoa nova.
+Mude SOMENTE duas coisas:
 
-Objetivo:
-Transformar a pessoa em um torcedor da Seleção Brasileira mantendo sua identidade com máxima fidelidade.
+1. A roupa: substitua pela camisa ${shirt}, com tecido esportivo realista, gola, mangas, escudo e caimento naturais.
+2. O fundo: substitua por um estádio de futebol lotado à noite, com luzes fortes e público desfocado em bokeh suave.
 
-Altere SOMENTE:
-
-1. Substitua a roupa pela camisa oficial da Seleção Brasileira: ${shirt}.
-   - Escudo, gola, mangas, tecido, costuras, brilho sutil e caimento devem parecer realistas.
-   - A camisa deve aparecer bem no tronco, como em foto oficial de credencial esportiva.
-
-2. Substitua o fundo por um estádio de futebol lotado à noite.
-   - Luzes fortes de estádio.
-   - Público desfocado com bokeh suave.
-   - Atmosfera cinematográfica e editorial.
-
-Preserve exatamente:
-- rosto;
-- formato da cabeça;
-- olhos;
-- nariz;
-- boca;
-- sorriso;
-- barba, se houver;
-- cabelo;
-- idade aparente;
-- tom de pele;
-- expressão;
-- direção do olhar;
-- proporções faciais.
+Todo o resto deve permanecer idêntico à foto enviada:
+mesmo rosto, mesmo formato da cabeça, mesmo olhar, mesmos olhos, mesmo nariz, mesma boca, mesmo sorriso, mesma barba se houver, mesmo cabelo, mesma idade aparente, mesmo tom de pele, mesma expressão, mesma direção do olhar e mesmas proporções faciais.
 
 Não reestilize o rosto.
 Não embeleze.
 Não rejuveneça.
-Não altere a identidade.
-Não gere uma pessoa parecida; mantenha a mesma pessoa da fotografia.
+Não modifique traços faciais.
+Não gere uma pessoa parecida.
+Preserve a identidade da pessoa da fotografia original.
 
-Enquadramento obrigatório:
-- mostrar da metade do tórax até acima da cabeça;
-- mostrar ombros e parte relevante do tronco;
-- pessoa centralizada, olhando para a câmera;
-- rosto totalmente livre, sem cortes e sem obstruções;
-- deixar espaço visual nas laterais do corpo para sobreposição futura de elementos gráficos;
-- não cortar cabelo, testa, queixo, ombros ou braços.
+Enquadramento:
+- cabeça, ombros e parte do tórax visíveis;
+- a pessoa deve aparecer de frente para a câmera;
+- manter margem acima do cabelo;
+- não cortar testa, cabelo, queixo, ombros ou parte superior do tronco;
+- mostrar mais camisa do que uma selfie comum, mas sem inventar nova pose corporal;
+- deixar algum espaço lateral no fundo para futura sobreposição de cards gráficos;
+- o rosto deve ficar totalmente livre e centralizado.
 
-Resultado:
-Fotografia editorial hiper-realista, parecendo uma foto oficial de credencial esportiva da torcida brasileira.
+Resultado final:
+fotografia editorial realista de credencial esportiva, como se a mesma foto tivesse sido tirada dentro do estádio.
 `.trim();
 
   const form = new FormData();
