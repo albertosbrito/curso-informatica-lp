@@ -72,35 +72,23 @@ async function handleGenerate(request, env) {
   catch (e) { return cors(json({ error: e.message }, 400)); }
 
   const prompt = `
-Transforme esta imagem - sem distorcer a face - em uma foto de jogador da seleção brasileira com a camisa ${shirt} dentro de um estádio estúdio lotado.
+Edite esta fotografia real. Mude SOMENTE duas coisas:
 
-Escolha um fundo em cor complementar que valorize o tom de pele da pessoa.
+1. A roupa: substitua pela camisa ${shirt} da Seleção Brasileira de futebol, com caimento e tecido realistas.
+2. O fundo: estádio de futebol lotado à noite, desfocado (bokeh suave), atrás da pessoa.
 
-Mantenha um enquadramento fechado de cabeça e ombros, com a pessoa centralizada e de frente para a câmera, com uma expressão otimista.
+Todo o resto permanece idêntico à foto enviada: mesmo rosto, mesma expressão, mesmo olhar, mesma barba, mesmo cabelo, mesmo tom de pele, mesma iluminação sobre o rosto e mesma posição da cabeça.
 
-Aplique iluminação direcional com sombras sutis.
-
-Preserve rigorosamente a identidade da pessoa da selfie:
-- não altere o formato do rosto;
-- não altere olhos, nariz, boca ou sorriso;
-- não afine ou alargue a face;
-- não rejuveneça nem envelheça;
-- não mude barba, cabelo ou sobrancelhas;
-- preserve exatamente os traços faciais e a proporção da cabeça.
-
-A única transformação desejada é substituir a roupa pela camisa ${shirt} da Seleção Brasileira, mantendo aparência refinada, minimalista e editorial, como um ensaio de revista.
-
-Preserve os tons naturais da pele.
-
-A imagem deve parecer uma fotografia profissional real, não uma ilustração nem uma pessoa diferente.
+Isto é uma edição da foto existente, não a criação de uma pessoa nova. O resultado deve parecer que a mesma foto foi tirada dentro do estádio: enquadramento de cabeça e ombros, fotografia editorial realista.
 `.trim();
 
   const form = new FormData();
   form.append('model', 'gpt-image-1');
   form.append('image', selfie);
   form.append('prompt', prompt);
-  form.append('size', '1024x1536');
+  form.append('input_fidelity', 'high');
   form.append('quality', 'high');
+  form.append('size', '1024x1536');
 
   const aiResp = await fetch('https://api.openai.com/v1/images/edits', {
     method: 'POST',
