@@ -74,16 +74,55 @@ async function handleGenerate(request, env, ctx) {
   catch (e) { return cors(json({ error: e.message }, 400)); }
 
   const prompt = `
-Edite esta fotografia real. Mude SOMENTE duas coisas:
+Edite esta fotografia real.
 
-1. A roupa: substitua pela camisa ${shirt}, com caimento realista, tecido esportivo premium, brilho sutil, gola, mangas e detalhes fiéis ao uniforme oficial.
-2. O fundo: estádio de futebol lotado à noite, desfocado (bokeh suave), atrás da pessoa.
+Esta é uma EDIÇÃO da foto enviada, não crie uma pessoa nova.
 
-Todo o resto permanece idêntico à foto enviada: mesmo rosto, mesma expressão, mesmo olhar, mesma barba, mesmo cabelo, mesmo tom de pele, mesma iluminação sobre o rosto e mesma posição da cabeça.
+Objetivo:
+Transformar a pessoa em um torcedor da Seleção Brasileira mantendo sua identidade com máxima fidelidade.
 
-Isto é uma edição da foto existente, não a criação de uma pessoa nova.
+Altere SOMENTE:
 
-O resultado deve parecer que a mesma foto foi tirada dentro do estádio: enquadramento fechado de cabeça e ombros, pessoa centralizada, de frente para a câmera, com margem visível acima da cabeça, sem cortar testa, cabelo ou queixo, fotografia editorial realista.
+1. Substitua a roupa pela camisa oficial da Seleção Brasileira: ${shirt}.
+   - Escudo, gola, mangas, tecido, costuras, brilho sutil e caimento devem parecer realistas.
+   - A camisa deve aparecer bem no tronco, como em foto oficial de credencial esportiva.
+
+2. Substitua o fundo por um estádio de futebol lotado à noite.
+   - Luzes fortes de estádio.
+   - Público desfocado com bokeh suave.
+   - Atmosfera cinematográfica e editorial.
+
+Preserve exatamente:
+- rosto;
+- formato da cabeça;
+- olhos;
+- nariz;
+- boca;
+- sorriso;
+- barba, se houver;
+- cabelo;
+- idade aparente;
+- tom de pele;
+- expressão;
+- direção do olhar;
+- proporções faciais.
+
+Não reestilize o rosto.
+Não embeleze.
+Não rejuveneça.
+Não altere a identidade.
+Não gere uma pessoa parecida; mantenha a mesma pessoa da fotografia.
+
+Enquadramento obrigatório:
+- mostrar da metade do tórax até acima da cabeça;
+- mostrar ombros e parte relevante do tronco;
+- pessoa centralizada, olhando para a câmera;
+- rosto totalmente livre, sem cortes e sem obstruções;
+- deixar espaço visual nas laterais do corpo para sobreposição futura de elementos gráficos;
+- não cortar cabelo, testa, queixo, ombros ou braços.
+
+Resultado:
+Fotografia editorial hiper-realista, parecendo uma foto oficial de credencial esportiva da torcida brasileira.
 `.trim();
 
   const form = new FormData();
