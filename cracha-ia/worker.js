@@ -49,7 +49,15 @@ async function handleGenerate(request, env) {
   try { selfie = dataUrlToFile(body.selfieDataUrl, 'selfie.png'); }
   catch (e) { return cors(json({ error: e.message }, 400)); }
 
-  const prompt = `Transforme a pessoa da selfie em uma foto vertical hiper-realista de campanha esportiva. A pessoa deve aparecer do peito até a cabeça, olhando para a câmera, vestindo ${shirt}, com tecido premium, brilho visível, textura real, escudo inspirado no Brasil, gola e mangas bem definidas. Preserve a identidade facial da selfie. Não coloque a selfie em círculo. Não faça colagem. Não adicione texto, crachá, botões, moldura ou interface. Fundo: estádio moderno à noite, luzes fortes, clima de convocação, fotografia publicitária, alta nitidez.`;
+  const prompt = `
+Use a selfie enviada como referência principal de identidade facial.
+Preserve com alta fidelidade: formato do rosto, olhos, nariz, boca, sorriso, idade aparente, proporção da face, cabelo, barba se houver, cor da pele e expressão.
+Não embeleze demais, não transforme em outra pessoa, não afine o rosto, não troque traços, não mude idade, não gere rosto genérico.
+Crie uma foto vertical hiper-realista de campanha esportiva, do peito até a cabeça, olhando para a câmera, vestindo ${shirt}.
+A camisa deve ter tecido premium, brilho visível, textura real, gola e mangas bem definidas, com estética inspirada na seleção brasileira.
+Integre naturalmente cabeça, pescoço, ombros e luz. Não coloque a selfie em círculo. Não faça colagem. Não adicione texto, crachá, botões, moldura, marca d'água ou interface.
+Fundo: estádio moderno à noite, luzes fortes, clima de convocação, fotografia publicitária, alta nitidez.
+`.trim();
 
   const form = new FormData();
   form.append('model', 'gpt-image-1');
