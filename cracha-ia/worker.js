@@ -1,16 +1,38 @@
+const PAGE_URL = 'https://raw.githubusercontent.com/albertosbrito/curso-informatica-lp/main/cracha-ia/index.html';
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
 
     if (request.method === 'OPTIONS') return cors(new Response(null, { status: 204 }));
 
-    if (url.pathname.endsWith('/api/generate-shirt-image') && request.method === 'POST') {
+    if (url.pathname === '/' && request.method === 'GET') {
+      return servePage();
+    }
+
+    if (url.pathname === '/api/generate-shirt-image' && request.method === 'POST') {
       return handleGenerate(request, env);
     }
 
-    return cors(json({ error: 'Endpoint não encontrado.' }, 404));
+    return cors(json({ error: 'Endpoint não encontrado.', dica: 'Abra / para a página ou POST /api/generate-shirt-image para gerar a foto.' }, 404));
   }
 };
+
+async function servePage() {
+  const page = await fetch(PAGE_URL, { cf: { cacheTtl: 60, cacheEverything: true } });
+  if (!page.ok) {
+    return new Response('Página do crachá indisponível no GitHub.', { status: 502 });
+  }
+  let html = await page.text();
+  html = html.replaceAll("file:///api/generate-shirt-image", "/api/generate-shirt-image");
+  html = html.replaceAll("https://cracha-ia-da-torcida-api.alberto-s-brito.workers.dev/api/generate-shirt-image", "/api/generate-shirt-image");
+  return new Response(html, {
+    headers: {
+      'content-type': 'text/html; charset=utf-8',
+      'cache-control': 'no-store'
+    }
+  });
+}
 
 function json(data, status = 200) {
   return new Response(JSON.stringify(data), {
@@ -22,7 +44,7 @@ function json(data, status = 200) {
 function cors(response) {
   const h = new Headers(response.headers);
   h.set('access-control-allow-origin', '*');
-  h.set('access-control-allow-methods', 'POST, OPTIONS');
+  h.set('access-control-allow-methods', 'POST, OPTIONS, GET');
   h.set('access-control-allow-headers', 'content-type, authorization');
   return new Response(response.body, { status: response.status, statusText: response.statusText, headers: h });
 }
@@ -50,13 +72,13 @@ async function handleGenerate(request, env) {
   catch (e) { return cors(json({ error: e.message }, 400)); }
 
   const prompt = `
-Use a selfie enviada como referência principal de identidade facial.
-Preserve com alta fidelidade: formato do rosto, olhos, nariz, boca, sorriso, idade aparente, proporção da face, cabelo, barba se houver, cor da pele e expressão.
-Não embeleze demais, não transforme em outra pessoa, não afine o rosto, não troque traços, não mude idade, não gere rosto genérico.
-Crie uma foto vertical hiper-realista de campanha esportiva, do peito até a cabeça, olhando para a câmera, vestindo ${shirt}.
+Use a selfie enviada como referência obrigatória de identidade facial, não apenas inspiração.
+Preserve com máxima fidelidade: formato do rosto, largura da testa, linha do cabelo, olhos, sobrancelhas, nariz, boca, sorriso, dentes se visíveis, bochechas, queixo, idade aparente, proporção da face, cor da pele e expressão.
+Não crie uma pessoa nova. Não deixe o rosto mais jovem, mais magro, mais simétrico ou genérico. Não altere traços marcantes. Não embeleze demais.
+Apenas transforme a foto para parecer uma sessão esportiva profissional: pessoa do peito até a cabeça, olhando para a câmera, vestindo ${shirt}.
 A camisa deve ter tecido premium, brilho visível, textura real, gola e mangas bem definidas, com estética inspirada na seleção brasileira.
-Integre naturalmente cabeça, pescoço, ombros e luz. Não coloque a selfie em círculo. Não faça colagem. Não adicione texto, crachá, botões, moldura, marca d'água ou interface.
-Fundo: estádio moderno à noite, luzes fortes, clima de convocação, fotografia publicitária, alta nitidez.
+Integre naturalmente cabeça, pescoço, ombros e iluminação. Não coloque a selfie em círculo. Não faça colagem. Não adicione texto, crachá, botões, moldura, marca d'água ou interface.
+Fundo: estádio moderno à noite, luzes fortes, fotografia publicitária, alta nitidez.
 `.trim();
 
   const form = new FormData();
