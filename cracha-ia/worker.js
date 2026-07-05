@@ -24,8 +24,8 @@ async function servePage() {
     return new Response('Página do crachá indisponível no GitHub.', { status: 502 });
   }
   let html = await page.text();
-  html = html.replaceAll("file:///api/generate-shirt-image", "/api/generate-shirt-image");
-  html = html.replaceAll("https://cracha-ia-da-torcida-api.alberto-s-brito.workers.dev/api/generate-shirt-image", "/api/generate-shirt-image");
+  html = html.replaceAll('file:///api/generate-shirt-image', '/api/generate-shirt-image');
+  html = html.replaceAll('https://cracha-ia-da-torcida-api.alberto-s-brito.workers.dev/api/generate-shirt-image', '/api/generate-shirt-image');
   return new Response(html, {
     headers: {
       'content-type': 'text/html; charset=utf-8',
@@ -66,19 +66,33 @@ async function handleGenerate(request, env) {
   try { body = await request.json(); }
   catch { return cors(json({ error: 'JSON inválido.' }, 400)); }
 
-  const shirt = body.shirt === 'azul' ? 'camisa azul reserva do Brasil' : 'camisa amarela titular do Brasil';
+  const shirt = body.shirt === 'azul' ? 'azul' : 'amarela';
   let selfie;
   try { selfie = dataUrlToFile(body.selfieDataUrl, 'selfie.png'); }
   catch (e) { return cors(json({ error: e.message }, 400)); }
 
   const prompt = `
-Use a selfie enviada como referência obrigatória de identidade facial, não apenas inspiração.
-Preserve com máxima fidelidade: formato do rosto, largura da testa, linha do cabelo, olhos, sobrancelhas, nariz, boca, sorriso, dentes se visíveis, bochechas, queixo, idade aparente, proporção da face, cor da pele e expressão.
-Não crie uma pessoa nova. Não deixe o rosto mais jovem, mais magro, mais simétrico ou genérico. Não altere traços marcantes. Não embeleze demais.
-Apenas transforme a foto para parecer uma sessão esportiva profissional: pessoa do peito até a cabeça, olhando para a câmera, vestindo ${shirt}.
-A camisa deve ter tecido premium, brilho visível, textura real, gola e mangas bem definidas, com estética inspirada na seleção brasileira.
-Integre naturalmente cabeça, pescoço, ombros e iluminação. Não coloque a selfie em círculo. Não faça colagem. Não adicione texto, crachá, botões, moldura, marca d'água ou interface.
-Fundo: estádio moderno à noite, luzes fortes, fotografia publicitária, alta nitidez.
+Transforme esta imagem - sem distorcer a face - em uma foto de jogador da seleção brasileira com a camisa ${shirt} dentro de um estádio estúdio lotado.
+
+Escolha um fundo em cor complementar que valorize o tom de pele da pessoa.
+
+Mantenha um enquadramento fechado de cabeça e ombros, com a pessoa centralizada e de frente para a câmera, com uma expressão otimista.
+
+Aplique iluminação direcional com sombras sutis.
+
+Preserve rigorosamente a identidade da pessoa da selfie:
+- não altere o formato do rosto;
+- não altere olhos, nariz, boca ou sorriso;
+- não afine ou alargue a face;
+- não rejuveneça nem envelheça;
+- não mude barba, cabelo ou sobrancelhas;
+- preserve exatamente os traços faciais e a proporção da cabeça.
+
+A única transformação desejada é substituir a roupa pela camisa ${shirt} da Seleção Brasileira, mantendo aparência refinada, minimalista e editorial, como um ensaio de revista.
+
+Preserve os tons naturais da pele.
+
+A imagem deve parecer uma fotografia profissional real, não uma ilustração nem uma pessoa diferente.
 `.trim();
 
   const form = new FormData();
