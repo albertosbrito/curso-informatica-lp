@@ -1,7 +1,7 @@
 const PAGE_URL = 'https://raw.githubusercontent.com/albertosbrito/curso-informatica-lp/main/cracha-ia/index.html';
 
 export default {
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
     const url = new URL(request.url);
 
     if (request.method === 'OPTIONS') return cors(new Response(null, { status: 204 }));
@@ -11,7 +11,7 @@ export default {
     }
 
     if (url.pathname === '/api/generate-shirt-image' && request.method === 'POST') {
-      return handleGenerate(request, env);
+      return handleGenerate(request, env, ctx);
     }
 
     return cors(json({ error: 'Endpoint não encontrado.', dica: 'Abra / para a página ou POST /api/generate-shirt-image para gerar a foto.' }, 404));
@@ -59,7 +59,7 @@ function dataUrlToFile(dataUrl, filename) {
   return new File([bytes], filename, { type: mime });
 }
 
-async function handleGenerate(request, env) {
+async function handleGenerate(request, env, ctx) {
   if (!env.OPENAI_API_KEY) return cors(json({ error: 'OPENAI_API_KEY não configurada no Worker.' }, 500));
 
   let body;
@@ -110,7 +110,45 @@ O resultado deve parecer que a mesma foto foi tirada dentro do estádio: enquadr
   const b64 = payload?.data?.[0]?.b64_json;
   if (!b64) return cors(json({ error: 'A OpenAI não retornou imagem.' }, 502));
 
+  const meta = {
+    nome: body.nome || body.name || body.nomeCracha || '',
+    cidade: body.cidade || body.city || '',
+    jogador: body.jogador || body.jogadorChave || '',
+    camisa: body.shirt === 'azul' ? 'Camisa 2 azul' : 'Camisa 1 amarela',
+    userAgent: request.headers.get('user-agent') || '',
+    country: request.cf?.country || '',
+    timestamp: new Date().toLocaleString('pt-BR', { timeZone: 'America/Maceio' })
+  };
+
+  if (ctx) ctx.waitUntil(notifyTelegram(env, meta));
+  else notifyTelegram(env, meta).catch(() => {});
+
   return cors(json({ imageDataUrl: `data:image/png;base64,${b64}` }));
+}
+
+async function notifyTelegram(env, meta) {
+  if (!env.TELEGRAM_BOT_TOKEN || !env.TELEGRAM_CHAT_ID) return;
+
+  const lines = [
+    '🟡 Novo crachá gerado',
+    '',
+    `Camisa: ${meta.camisa}`,
+    meta.nome ? `Nome: ${meta.nome}` : null,
+    meta.cidade ? `Cidade: ${meta.cidade}` : null,
+    meta.jogador ? `Jogador-chave: ${meta.jogador}` : null,
+    meta.country ? `País: ${meta.country}` : null,
+    `Hora: ${meta.timestamp}`
+  ].filter(Boolean);
+
+  await fetch(`https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/sendMessage`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({
+      chat_id: env.TELEGRAM_CHAT_ID,
+      text: lines.join('\n'),
+      disable_web_page_preview: true
+    })
+  });
 }
 
 function extractOpenAIError(text) {
