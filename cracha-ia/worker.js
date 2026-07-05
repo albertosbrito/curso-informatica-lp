@@ -66,7 +66,9 @@ async function handleGenerate(request, env) {
   try { body = await request.json(); }
   catch { return cors(json({ error: 'JSON inválido.' }, 400)); }
 
-  const shirt = body.shirt === 'azul' ? 'azul' : 'amarela';
+  const shirt = body.shirt === 'azul'
+    ? 'azul reserva oficial da Seleção Brasileira de futebol'
+    : 'amarela titular oficial da Seleção Brasileira de futebol';
   let selfie;
   try { selfie = dataUrlToFile(body.selfieDataUrl, 'selfie.png'); }
   catch (e) { return cors(json({ error: e.message }, 400)); }
@@ -74,12 +76,14 @@ async function handleGenerate(request, env) {
   const prompt = `
 Edite esta fotografia real. Mude SOMENTE duas coisas:
 
-1. A roupa: substitua pela camisa ${shirt} da Seleção Brasileira de futebol, com caimento e tecido realistas.
+1. A roupa: substitua pela camisa ${shirt}, com caimento realista, tecido esportivo premium, brilho sutil, gola, mangas e detalhes fiéis ao uniforme oficial.
 2. O fundo: estádio de futebol lotado à noite, desfocado (bokeh suave), atrás da pessoa.
 
 Todo o resto permanece idêntico à foto enviada: mesmo rosto, mesma expressão, mesmo olhar, mesma barba, mesmo cabelo, mesmo tom de pele, mesma iluminação sobre o rosto e mesma posição da cabeça.
 
-Isto é uma edição da foto existente, não a criação de uma pessoa nova. O resultado deve parecer que a mesma foto foi tirada dentro do estádio: enquadramento de cabeça e ombros, fotografia editorial realista.
+Isto é uma edição da foto existente, não a criação de uma pessoa nova.
+
+O resultado deve parecer que a mesma foto foi tirada dentro do estádio: enquadramento fechado de cabeça e ombros, pessoa centralizada, de frente para a câmera, com margem visível acima da cabeça, sem cortar testa, cabelo ou queixo, fotografia editorial realista.
 `.trim();
 
   const form = new FormData();
